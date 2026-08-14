@@ -1,7 +1,7 @@
 /*
 Theme Name: Haivora Logistics
 Theme URI: https://qidexexpress.com/haivora-logistics
-Author: Qidex Express LOGISTICS
+Author: Haivora
 Author URI: https://qidexexpress.com
 Description: Premium, production-ready WordPress theme for international logistics, cargo, freight forwarding, and shipment tracking platforms.
 Version: 1.0.0
@@ -11,10 +11,15 @@ Text Domain: haivora-logistics
 Tags: logistics, shipping, freight, tracking, corporate, responsive-layout, custom-menu, custom-logo, elementor-compatible
 */
 
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 /* ==========================================================================
-   DESIGN SYSTEM & CSS VARIABLES
+   GEOMETRIC BALANCE DESIGN SYSTEM & CSS VARIABLES
    ========================================================================== */
 :root {
   /* Brand Colors */

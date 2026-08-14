@@ -1,0 +1,6 @@
+{
+  "name": "Haivora Logistics",
+  "description": "A production-ready WordPress theme for international logistics, cargo, freight forwarding, and shipment tracking platforms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

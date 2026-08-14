@@ -1,0 +1,26 @@
+/**
+ * Responsive CSS Overrides for Haivora Logistics Theme
+ */
+@media (max-width: 576px) {
+    .hero-headline {
+        font-size: 2rem !important;
+    }
+
+    .section-padding {
+        padding: 3rem 0 !important;
+    }
+
+    .tracking-card {
+        padding: 1.25rem !important;
+    }
+
+    .cta-banner {
+        padding: 2.25rem 1.25rem !important;
+    }
+}
+
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1360px !important;
+    }
+}

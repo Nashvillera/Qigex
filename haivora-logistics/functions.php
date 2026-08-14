@@ -147,6 +147,51 @@ if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/shipment-admin.php')) {
 }
 
 /**
+ * Phase 5: Customer Accounts, Authorization & Notifications
+ */
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/customer-auth.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/customer-auth.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/notifications.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/notifications.php';
+}
+
+/**
+ * Phase 6: Quote, Contact, WhatsApp & Email Notifications
+ */
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/whatsapp.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/whatsapp.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/email-notifications.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/email-notifications.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/quotes.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/quotes.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/contact.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/contact.php';
+}
+
+/**
+ * Phase 7: API and Payment-Ready Architecture
+ */
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/carrier-api.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/carrier-api.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/payments.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/payments.php';
+}
+
+if (file_exists(HAIVORA_LOGISTICS_DIR . '/inc/api-rest.php')) {
+    require_once HAIVORA_LOGISTICS_DIR . '/inc/api-rest.php';
+}
+
+/**
  * Helper Functions for Branding Defaults
  */
 function haivora_logistics_company_name() {

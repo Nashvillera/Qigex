@@ -1,8 +1,8 @@
-# Haivora Logistics - Native WordPress Theme (Phase 1)
+# Haivora Logistics - Native WordPress Theme
 
 **Company Branding:** Qidex Express LOGISTICS  
 **Theme Name:** Haivora Logistics  
-**Version:** 1.0.0  
+**Version:** 1.7.0 (Phase 7 Release)  
 **License:** GPL v2 or later  
 
 ---
@@ -11,81 +11,110 @@
 
 **Haivora Logistics** is a production-grade, high-performance native WordPress theme designed specifically for international logistics companies, freight forwarders, cargo ocean liners, air express couriers, and supply chain management platforms.
 
-Phase 1 establishes the complete theme core, visual design system, responsive navigation, customizer integration, and interactive Phase 1 tracking widget interface.
+Phase 7 adds complete **API and Payment-Ready Architecture** with WordPress REST API endpoints (`haivora/v1`), carrier integration wrappers (DHL, FedEx, UPS, Aramex), multi-provider payment processing (Flutterwave, Paystack, Stripe), cryptographic webhook verification, and administrative financial transaction management.
 
 ---
 
-## 📁 Directory Structure
+## 🔌 WordPress REST API Architecture (`haivora/v1`)
 
+The theme registers custom REST routes under namespace `haivora/v1` using `register_rest_route()`:
+
+| Method | Endpoint | Description | Permission Callback |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/wp-json/haivora/v1/shipments` | List all shipments | Admin (`manage_options`) / Logged-in User |
+| `GET` | `/wp-json/haivora/v1/shipments/{id}` | Get single shipment details | Admin / Cargo Owner |
+| `POST` | `/wp-json/haivora/v1/shipments` | Register & dispatch new shipment | Admin / Authorized Client |
+| `PUT` | `/wp-json/haivora/v1/shipments/{id}` | Update shipment status/telemetry | Admin only (`manage_options`) |
+| `GET` | `/wp-json/haivora/v1/track/{code}` | Public tracking query (PII Masked) | `__return_true` (Public) |
+| `POST` | `/wp-json/haivora/v1/payments/initiate` | Initiate payment transaction token | Public / Client Validation |
+| `GET` | `/wp-json/haivora/v1/payments/transactions` | Retrieve financial audit log | Admin only (`manage_options`) |
+| `POST` | `/wp-json/haivora/v1/webhooks/payment` | Cryptographic Webhook Handler | Webhook Signature Check |
+
+---
+
+## 🚢 Carrier Logistics API Integration
+
+**Status:** `READY FOR INTEGRATION`
+
+The carrier layer (`inc/carrier-api.php`) provides unified abstractions for external logistics carrier APIs (DHL Express, FedEx Web Services, UPS Shipping, Aramex):
+
+- `haivora_api_create_shipment($data)`
+- `haivora_api_get_shipment($tracking_number)`
+- `haivora_api_update_shipment($tracking_number, $data)`
+- `haivora_api_track_shipment($tracking_number)`
+
+To connect a live carrier account, define your carrier credentials in `wp-config.php` or environment variables:
+
+```php
+// wp-config.php
+define('HAIVORA_CARRIER_PROVIDER', 'dhl_express');
+define('HAIVORA_CARRIER_API_URL', 'https://express.api.dhl.com/v1');
+define('HAIVORA_CARRIER_API_KEY', 'your_dhl_api_key');
+define('HAIVORA_CARRIER_API_SECRET', 'your_dhl_api_secret');
+define('HAIVORA_CARRIER_MODE', 'production');
 ```
-haivora-logistics/
-│
-├── style.css             # Theme header & design system CSS variables
-├── functions.php         # Core theme setup, enqueues, customizer hooks
-├── index.php             # Main template fallback
-├── front-page.php        # Homepage layout (11 Phase 1 sections)
-├── home.php              # Blog / Logistics Insights page
-├── header.php            # Announcement bar, branding logo, navigation bar
-├── footer.php            # 4-column footer, quick links, contact & copyright
-├── page.php              # Single page template (Elementor compatible)
-├── single.php            # Single post template
-├── archive.php           # Archive & category template
-├── search.php            # Search results template
-├── searchform.php        # Accessible search form
-├── 404.php               # 404 error page template
-├── comments.php          # Comments layout
-├── sidebar.php           # Sidebar widget area
-├── screenshot.png        # WordPress theme dashboard preview image
-├── README.md             # Documentation
-│
-├── inc/
-│   ├── customizer.php    # WP Appearance Customizer settings
-│   └── template-tags.php # Helper tags & logo renderer
-│
-└── assets/
-    ├── css/
-    │   ├── main.css      # Core theme styles
-    │   └── responsive.css# Breakpoint media queries
-    ├── js/
-    │   ├── navigation.js # Mobile menu & hamburger accessibility
-    │   ├── main.js       # Sticky header & smooth anchor scroll
-    │   └── tracking-preview.js # Interactive tracking demo widget
-    ├── images/           # SVG graphics & vector assets
-    └── icons/            # SVG icon set
+
+---
+
+## 💳 Payment Architecture & Webhooks
+
+**Status:** `READY FOR INTEGRATION`
+
+The payment module (`inc/payments.php`) supports multi-provider transactions across **Stripe**, **Flutterwave**, and **Paystack** for:
+- Shipping payments
+- Quote proposal payments
+- Invoice payments
+
+### Webhook Cryptographic Verification
+Webhooks are received at `/wp-json/haivora/v1/webhooks/payment` and strictly validated before modifying transaction state:
+- **Stripe:** Verifies `Stripe-Signature` header HMAC SHA256 against `HAIVORA_PAYMENT_WEBHOOK_SECRET`.
+- **Paystack:** Verifies `X-Paystack-Signature` HMAC SHA512 against secret key.
+- **Flutterwave:** Verifies `verif-hash` header match against `HAIVORA_PAYMENT_WEBHOOK_SECRET`.
+
+> **Security Rule:** Transactions are NEVER marked as `Successful` based on frontend browser redirects alone. Payment confirmation is executed exclusively server-side upon cryptographic webhook validation.
+
+### Payment Environment Configuration
+
+```php
+// wp-config.php
+define('HAIVORA_PAYMENT_PROVIDER', 'stripe'); // 'stripe' | 'flutterwave' | 'paystack'
+define('HAIVORA_PAYMENT_PUBLIC_KEY', 'pk_live_xxxxxxxxxxxx');
+define('HAIVORA_PAYMENT_SECRET_KEY', 'sk_live_xxxxxxxxxxxx'); // SERVER ONLY - Never expose to frontend
+define('HAIVORA_PAYMENT_WEBHOOK_SECRET', 'whsec_xxxxxxxxxxxx');
+define('HAIVORA_PAYMENT_CURRENCY', 'USD');
+define('HAIVORA_PAYMENT_MODE', 'live');
 ```
 
 ---
 
-## ⚙️ Installation Instructions (WordPress)
+## ⚙️ Administrative Portal (`/shipment-admin`)
 
-1. Download or clone this repository or export as ZIP.
-2. Ensure the `haivora-logistics` folder contains all theme files listed above.
-3. Log in to your WordPress Admin Dashboard (`wp-admin`).
-4. Go to **Appearance** &rarr; **Themes** &rarr; **Add New Theme**.
-5. Click **Upload Theme**, select the `haivora-logistics.zip` file (or upload the `haivora-logistics` folder to `/wp-content/themes/`).
-6. Click **Install Now** and then **Activate**.
-
----
-
-## 🎨 WordPress Customizer Features
-
-Navigate to **Appearance** &rarr; **Customize** &rarr; **Logistics Company Info** to customize:
-- Company Name (default: `Qidex Express LOGISTICS`)
-- Hotline Phone (default: `+1 (800) 555-QIDEX`)
-- Support Email (default: `support@qidexexpress.com`)
-- Corporate Address
-- WhatsApp Direct Number
-- Theme Primary & Accent Colors
+Navigate to `/shipment-admin` in your browser to access the complete dispatcher management suite:
+1. **📦 Shipments:** Create, edit, and update live shipment telemetry and multi-milestone timeline events.
+2. **📋 Quote Requests:** Review freight quote submissions, calculate rates, and send customer proposals.
+3. **📥 Contact Inbox:** Read customer support messages and update response statuses.
+4. **💳 Payments & Transactions:** Inspect financial transaction records, filter by gateway status, and issue refunds.
+5. **🔑 API & Integrations:** Configure Carrier API endpoints and Payment Gateway credentials.
+6. **💬 WhatsApp & Email:** Manage WhatsApp support floaters and audit live `wp_mail()` dispatches.
 
 ---
 
-## 🗺️ Roadmap & Multi-Phase Plan
+## 🔒 Security Best Practices
 
-- **Phase 1 (COMPLETED):** Brand identity, visual design system, WP theme templates, responsive header/footer, homepage layout, interactive tracking widget preview interface.
-- **Phase 2 (UPCOMING):** Shipment Custom Post Type (CPT), custom fields, meta boxes, shipment status taxonomies, tracking page template.
-- **Phase 3 (UPCOMING):** Live shipment tracking database engine, search logic, status timeline renderer.
-- **Phase 4 (UPCOMING):** Customer accounts, shipment history dashboard, tracking notifications.
-- **Phase 5 (UPCOMING):** Admin shipment manager, bulk update tool, barcode / QR code generator.
-- **Phase 6 (UPCOMING):** Instant freight quote calculator, automated email receipts, WhatsApp API integration.
-- **Phase 7 (UPCOMING):** Multi-language & currency support (WPML / Polylang compatibility), print manifest generator.
-- **Phase 8 (UPCOMING):** Final security audit, performance optimization, demo content XML import, theme package release.
+1. **Secret Key Isolation:** Secret keys (`HAIVORA_PAYMENT_SECRET_KEY`, `HAIVORA_CARRIER_API_SECRET`) are kept strictly server-side and never sent to client JS.
+2. **Card Security:** No credit card or CVV details are ever stored or processed in theme database tables (PCI DSS compliance).
+3. **PII Masking:** Public tracking queries on `/track/{code}` mask sensitive customer phone numbers and full addresses.
+4. **Nonce & Sanitization:** All forms use WordPress nonces (`wp_nonce_field`) and strict input sanitization (`sanitize_text_field()`, `sanitize_email()`).
+
+---
+
+## 🗺️ Roadmap & Multi-Phase Progress
+
+- ✅ **Phase 1:** Design System, WP Theme Core, Front Page Layout, Responsive Header & Footer.
+- ✅ **Phase 2:** Shipment Custom Post Type (`shipment`), Custom Fields, Status Taxonomies, Meta Boxes.
+- ✅ **Phase 3:** Interactive Tracking Search Engine, Status Timeline Component, PII Masking.
+- ✅ **Phase 4:** Administrative Shipment Manager, Multi-milestone Event Repeater, Status Filters.
+- ✅ **Phase 5:** Customer Authentication, Protected Dashboard, Real-time Status Notifications.
+- ✅ **Phase 6:** Freight Quote Calculator, Contact Inbox, WhatsApp Widget, Email Audit Log (`wp_mail`).
+- ✅ **Phase 7:** WordPress REST API (`haivora/v1`), Carrier API Architecture, Flutterwave/Paystack/Stripe Gateways, Cryptographic Webhook Handler.
+- ⏳ **Phase 8:** Final Security Audit, Performance Optimization, XML Demo Content Import, Release Package.

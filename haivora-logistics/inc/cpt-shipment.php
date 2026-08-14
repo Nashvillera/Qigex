@@ -74,6 +74,7 @@ add_action('init', 'haivora_register_shipment_cpt', 0);
  * Register Meta Boxes for Shipment Administration
  */
 function haivora_add_shipment_meta_boxes() {
+    // 1. Shipment Overview & Telemetry
     add_meta_box(
         'haivora_shipment_details',
         __('📦 Shipment Details & Telemetry', 'haivora-logistics'),
@@ -83,6 +84,7 @@ function haivora_add_shipment_meta_boxes() {
         'high'
     );
 
+    // 2. Sender & Receiver Info
     add_meta_box(
         'haivora_shipment_contacts',
         __('👥 Sender & Receiver Information', 'haivora-logistics'),
@@ -92,6 +94,7 @@ function haivora_add_shipment_meta_boxes() {
         'high'
     );
 
+    // 3. Package Specifications
     add_meta_box(
         'haivora_shipment_specs',
         __('🏷️ Package Specifications & Cargo Details', 'haivora-logistics'),
@@ -101,6 +104,7 @@ function haivora_add_shipment_meta_boxes() {
         'default'
     );
 
+    // 4. Tracking Events Repeater
     add_meta_box(
         'haivora_shipment_events',
         __('⏱️ Tracking Events & Milestones History', 'haivora-logistics'),
@@ -427,27 +431,34 @@ function haivora_shipment_events_meta_box_callback($post) {
  * Save Meta Box Data with Validation, Sanitization, Nonces, and Capability Checks
  */
 function haivora_save_shipment_meta_data($post_id) {
+    // Nonce Check
     if (!isset($_POST['haivora_shipment_nonce']) || !wp_verify_nonce($_POST['haivora_shipment_nonce'], 'haivora_shipment_meta_save')) {
         return;
     }
 
+    // Autosave check
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
     }
 
+    // Permission Check
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
 
+    // Verify post type
     if (isset($_POST['post_type']) && 'shipment' !== $_POST['post_type']) {
         return;
     }
 
+    // Sanitize and Validate Tracking Number (REQUIRED & UNIQUE)
     $tracking_number = isset($_POST['tracking_number']) ? sanitize_text_field(strtoupper(trim($_POST['tracking_number']))) : '';
     
     if (empty($tracking_number)) {
+        // Auto-generate if empty
         $tracking_number = 'QX-' . rand(1000, 9999) . '-US';
     } else {
+        // Check Uniqueness
         $existing = get_posts(array(
             'post_type'      => 'shipment',
             'posts_per_page' => 1,
@@ -458,6 +469,7 @@ function haivora_save_shipment_meta_data($post_id) {
         ));
 
         if (!empty($existing)) {
+            // Append unique suffix if duplicate
             $tracking_number = $tracking_number . '-' . rand(10, 99);
             set_transient('haivora_shipment_error_' . $post_id, 'Duplicate tracking number detected. A unique suffix was appended to avoid conflicts: ' . $tracking_number, 45);
         }
@@ -465,6 +477,7 @@ function haivora_save_shipment_meta_data($post_id) {
 
     update_post_meta($post_id, '_tracking_number', $tracking_number);
 
+    // Save Other Single Meta Fields
     $fields = array(
         'shipment_status'    => 'sanitize_text_field',
         'origin'             => 'sanitize_text_field',
@@ -490,6 +503,7 @@ function haivora_save_shipment_meta_data($post_id) {
         }
     }
 
+    // Save Tracking Events Array
     if (isset($_POST['tracking_events']) && is_array($_POST['tracking_events'])) {
         $sanitized_events = array();
         foreach ($_POST['tracking_events'] as $evt) {

@@ -42,11 +42,13 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
         <div class="top-bar-meta">
+            <a href="/dashboard" class="top-bar-badge" style="background: rgba(37, 99, 235, 0.2); color: #60A5FA; text-decoration: none; font-weight: 800; border: 1px solid rgba(37, 99, 235, 0.4);">
+                👤 Customer Dashboard
+            </a>
             <a href="/shipment-admin" class="top-bar-badge" style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; text-decoration: none; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.4);">
-                📦 Shipment Admin Portal
+                📦 Admin Portal
             </a>
             <span class="top-bar-badge">ISO 9001 Certified</span>
-            <span class="top-bar-badge" style="background: rgba(0,168,232,0.15); color: #00A8E8;">Global Coverage</span>
         </div>
     </div>
 </div>
@@ -78,6 +80,7 @@ if (!defined('ABSPATH')) {
                         <li class="menu-item"><a href="<?php echo esc_url(home_url('/#services')); ?>"><?php esc_html_e('Services', 'haivora-logistics'); ?></a></li>
                         <li class="menu-item"><a href="<?php echo esc_url(home_url('/#why-us')); ?>"><?php esc_html_e('About Us', 'haivora-logistics'); ?></a></li>
                         <li class="menu-item"><a href="<?php echo esc_url(home_url('/#quote')); ?>"><?php esc_html_e('Get a Quote', 'haivora-logistics'); ?></a></li>
+                        <li class="menu-item"><a href="<?php echo esc_url(home_url('/login/')); ?>"><?php esc_html_e('Customer Login', 'haivora-logistics'); ?></a></li>
                         <li class="menu-item"><a href="<?php echo esc_url(home_url('/#contact')); ?>"><?php esc_html_e('Contact', 'haivora-logistics'); ?></a></li>
                     </ul>
                     <?php
